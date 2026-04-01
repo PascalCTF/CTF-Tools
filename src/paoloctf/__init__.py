@@ -1,6 +1,6 @@
 """paoloctf - CLI tool for creating and managing CTF challenges for PascalCTF."""
 
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 __author__ = "Paolo"
 
 from .generator import Generator
