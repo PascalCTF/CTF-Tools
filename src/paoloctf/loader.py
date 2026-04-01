@@ -102,10 +102,10 @@ class Loader:
                     challenge = self.load_challenge(challenge_dir)
                     challenges.append(challenge)
                 except FileNotFoundError as e:
-                    print(f"⚠️  Skipping {challenge_dir.name}: {e}")
+                    print(f"Warning: Skipping {challenge_dir.name}: {e}")
         
         if not challenges:
-            print("⚠️  No valid challenges found")
+            print("Warning: No valid challenges found")
             return []
         
         # Write to CSV

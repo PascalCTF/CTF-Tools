@@ -3,6 +3,7 @@
 
 import argparse
 import sys
+from typing import List, Optional
 
 from . import __version__
 from .generator import Generator
@@ -17,26 +18,26 @@ def create_parser() -> argparse.ArgumentParser:
         epilog="For more information, visit: https://github.com/PascalCTF/CTF-Tools",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    
+
     parser.add_argument(
         "-v", "--version",
         action="version",
         version=f"%(prog)s {__version__}",
     )
-    
+
     subparsers = parser.add_subparsers(
         title="commands",
         dest="command",
         metavar="<command>",
     )
-    
+
     # Generate command
     gen_parser = subparsers.add_parser(
         "generate",
         aliases=["gen", "new"],
         help="Create a new CTF challenge directory structure",
         description="Generate a new CTF challenge with all required files and folders.",
-        epilog="""
+        epilog="""\
 Examples:
   paoloctf generate web
   paoloctf generate pwn --name buffer_overflow
@@ -55,14 +56,14 @@ Examples:
         metavar="NAME",
         help="Name of the challenge directory (default: challenge)",
     )
-    
+
     # Load command
     load_parser = subparsers.add_parser(
         "load",
         aliases=["export"],
         help="Export CTF challenges to CSV for CTFd import",
         description="Parse CTF challenge directories and export them to a CTFd-compatible CSV file.",
-        epilog="""
+        epilog="""\
 Examples:
   paoloctf load ./challenges
   paoloctf load ./ctf --output ctfd_import.csv
@@ -81,20 +82,23 @@ Examples:
         metavar="FILE",
         help="Output CSV filename (default: challenges.csv)",
     )
-    
+
     return parser
 
 
 def cmd_generate(args: argparse.Namespace) -> int:
     """Handle the generate command."""
     generator = Generator()
-    
+
     try:
         path = generator.new(args.category, args.name)
         print(f"Created challenge '{args.name}' in ./{path}/")
         print(f"  Category: {args.category}")
         print(f"  Edit the files in the directory to configure your challenge.")
         return 0
+    except FileExistsError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1
@@ -103,7 +107,7 @@ def cmd_generate(args: argparse.Namespace) -> int:
 def cmd_load(args: argparse.Namespace) -> int:
     """Handle the load command."""
     loader = Loader()
-    
+
     try:
         challenges = loader.parse(args.path, args.output)
         if challenges:
@@ -119,24 +123,25 @@ def cmd_load(args: argparse.Namespace) -> int:
         return 1
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: Optional[List[str]] = None) -> int:
     """Main entry point for the CLI."""
     parser = create_parser()
     args = parser.parse_args(argv)
-    
+
     if args.command is None:
         parser.print_help()
         print("\nUse 'paoloctf <command> --help' for more information on a command.")
         return 0
-    
+
     # Route to command handlers
     if args.command in ("generate", "gen", "new"):
         return cmd_generate(args)
     elif args.command in ("load", "export"):
         return cmd_load(args)
-    
+
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
+
