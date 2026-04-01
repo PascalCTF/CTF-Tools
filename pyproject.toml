@@ -9,7 +9,7 @@ description = "CLI tool for creating and managing CTF challenges for PascalCTF"
 readme = "README.md"
 license = "GPL-3.0-or-later"
 authors = [
-    {name = "PascalCTF", email = "pascalctf@example.com"}
+    {name = "PascalCTF"}
 ]
 keywords = ["ctf", "cybersecurity", "challenge", "generator", "pascalctf"]
 classifiers = [
